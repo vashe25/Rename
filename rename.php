@@ -26,12 +26,12 @@ foreach ($array as $item){
 }
 
 //Соберем CSV-шечку
-$header_csv = "OldName;Newname;\n";
+$header_csv = "OldName;Newname\n";
 
 $massive_csv[] = $header_csv;
 
 foreach ($filtered_files as $item){
-    $massive_csv[] = $item . ";newname.txt;\n";
+    $massive_csv[] = $item . ";newname.txt\n";
 }
 
 //Сохраним нашу CSV-шечку
@@ -42,3 +42,6 @@ $string_csv = implode("",$massive_csv);
 $fp = fopen($file_csv, "w");
 fwrite($fp, $string_csv);
 fclose($fp);
+
+//Откроем для редактирования пользователем CSV-шечку
+exec($file_csv);
