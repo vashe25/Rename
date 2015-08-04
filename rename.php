@@ -57,7 +57,7 @@ class Kernel {
         //Reading CSV-file
         $fp = fopen($this->file_csv, "r");
         $i = 0;
-        while (($array_csv[$i] = fgetcsv($fp, 50,";")) !== FALSE) {
+        while (($array_csv[$i] = fgetcsv($fp, 0,";")) !== FALSE) {
             $i++;
         }
         fclose($fp);
@@ -75,6 +75,9 @@ class Kernel {
         //
     }
     public function reName($array){
+        /**
+         * Ќужно отработать случай пустой строки
+         */
         foreach ($array as $value){
             rename($value[0], $value[1]);
         }
