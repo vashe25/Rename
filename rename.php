@@ -19,7 +19,7 @@ class Kernel {
     //searching for files
     public function scanFor(){
         //Дескриптор каталога
-        $dir_handle = opendir($this->current_dir);
+        opendir($this->current_dir);
         //Получаем массив элементов каталога
         $array = scandir($this->current_dir);
         //Create array for filtered elements
