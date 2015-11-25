@@ -8,26 +8,26 @@
 
 class Kernel {
     function __construct(){
-        echo "Kernel initialised...\n";
+        echo "Kernel->start\n\n";
     }
-    //Êàêèå ôàéëû íàñ èíòåðåñóþò
+    //ÐšÐ°ÐºÐ¸Ðµ Ñ„Ð°Ð¹Ð»Ñ‹ Ð½Ð°Ñ Ð¸Ð½Ñ‚ÐµÑ€ÐµÑÑƒÑŽÑ‚
     public $pattern = "*.txt";
-    //Òåêóùàÿ äèðåêòîðèÿ, â êîòîðîé çàïóñêàåòñÿ ñêðèïò
+    //Ð¢ÐµÐºÑƒÑ‰Ð°Ñ Ð´Ð¸Ñ€ÐµÐºÑ‚Ð¾Ñ€Ð¸Ñ, Ð² ÐºÐ¾Ñ‚Ð¾Ñ€Ð¾Ð¹ Ð·Ð°Ð¿ÑƒÑÐºÐ°ÐµÑ‚ÑÑ ÑÐºÑ€Ð¸Ð¿Ñ‚
     public $current_dir = "./";
     //Name of csv-file
     private $file_csv = "rename.csv";
     //searching for files
     public function scanFor(){
-        //Äåñêðèïòîð êàòàëîãà
+        //Ð”ÐµÑÐºÑ€Ð¸Ð¿Ñ‚Ð¾Ñ€ ÐºÐ°Ñ‚Ð°Ð»Ð¾Ð³Ð°
         $dir_handle = opendir($this->current_dir);
-        //Ïîëó÷àåì ìàññèâ ýëåìåíòîâ êàòàëîãà
+        //ÐŸÐ¾Ð»ÑƒÑ‡Ð°ÐµÐ¼ Ð¼Ð°ÑÑÐ¸Ð² ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚Ð¾Ð² ÐºÐ°Ñ‚Ð°Ð»Ð¾Ð³Ð°
         $array = scandir($this->current_dir);
         //Create array for filtered elements
         $filtered_files = array();
-        //Ïîèùåì â ìàññèâå íàøû ôàéëû
+        //ÐŸÐ¾Ð¸Ñ‰ÐµÐ¼ Ð² Ð¼Ð°ÑÑÐ¸Ð²Ðµ Ð½Ð°ÑˆÑ‹ Ñ„Ð°Ð¹Ð»Ñ‹
         foreach ($array as $item){
             if (fnmatch($this->pattern, $item)){
-                //Íàéäåíûå ôàéëû ñîáåðåì â ìàññèâ÷èê
+                //ÐÐ°Ð¹Ð´ÐµÐ½Ñ‹Ðµ Ñ„Ð°Ð¹Ð»Ñ‹ ÑÐ¾Ð±ÐµÑ€ÐµÐ¼ Ð² Ð¼Ð°ÑÑÐ¸Ð²Ñ‡Ð¸Ðº
                 $filtered_files[] = $item;
             }
         }
@@ -36,14 +36,14 @@ class Kernel {
         //
     }
     public function createFile($filtered_files){
-        //Ñîáåðåì CSV-øå÷êó
+        //Ð¡Ð¾Ð±ÐµÑ€ÐµÐ¼ CSV-ÑˆÐµÑ‡ÐºÑƒ
         $massive_csv = array();
         //add second column
         foreach ($filtered_files as $item){
             $massive_csv[] = $item . ";newname.txt\n";
         }
         //
-        //Ñîõðàíèì íàøó CSV-øå÷êó
+        //Ð¡Ð¾Ñ…Ñ€Ð°Ð½Ð¸Ð¼ Ð½Ð°ÑˆÑƒ CSV-ÑˆÐµÑ‡ÐºÑƒ
         //Gluing array to string
         $string_csv = implode("",$massive_csv);
         //Writing string to file
@@ -62,24 +62,31 @@ class Kernel {
         }
         fclose($fp);
         /*
-            Array[0]->header
             Array[1][0]->oldName
             Array[1][1]->newName
         */
+        //delete the last element of arra, because it = False
+        unset ($array_csv[$i]);
         return $array_csv;
         //
     }
     public function openFile(){
-        //Îòêðîåì äëÿ ðåäàêòèðîâàíèÿ ïîëüçîâàòåëåì CSV-øå÷êó
+        //ÐžÑ‚ÐºÑ€Ð¾ÐµÐ¼ Ð´Ð»Ñ Ñ€ÐµÐ´Ð°ÐºÑ‚Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ñ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÐµÐ¼ CSV-ÑˆÐµÑ‡ÐºÑƒ
         exec($this->file_csv);
         //
     }
+    /**
+     * @param $array
+     */
     public function reName($array){
         /**
-         * Íóæíî îòðàáîòàòü ñëó÷àé ïóñòîé ñòðîêè
+         * ÐÑƒÐ¶Ð½Ð¾ Ð¾Ñ‚Ñ€Ð°Ð±Ð¾Ñ‚Ð°Ñ‚ÑŒ ÑÐ»ÑƒÑ‡Ð°Ð¹ Ð¿ÑƒÑÑ‚Ð¾Ð¹ ÑÑ‚Ñ€Ð¾ÐºÐ¸
          */
         foreach ($array as $value){
-            rename($value[0], $value[1]);
+            if (rename($value[0], $value[1])){
+                echo "Done: ";
+            }
+            echo $value[0] . " -> " . $value[1] . "\n";
         }
     }
     public function rollBack($array){
@@ -126,7 +133,10 @@ switch ($parameter){
         echo "find pdf - this will find all pdf files in current location\n";
         echo "rename - reads the csv file, and renames all files\n";
         echo "rollback - renames backward\n";
-        echo "kill - is for deleting garbage\n";
+        echo "kill - is for deleting garbage\n\n";
+        echo "Example:\n";
+        echo "php \$script_path/rename.php find pdf\n find all *.pdf files in current folder and create a *.csv file\n";
         echo "  Good luck, Commander!\n";
         break;
 }
+echo "\nKernel->exit\n";
