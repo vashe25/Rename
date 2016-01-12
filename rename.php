@@ -8,7 +8,9 @@
 
 class Kernel {
     function __construct(){
+
         echo "Kernel->start\n\n";
+
     }
     //Какие файлы нас интересуют
     public $pattern = "*.txt";
@@ -98,6 +100,9 @@ class Kernel {
         unlink($this->file_csv);
     }
 }
+
+//Выставляем UTF-8 в консоли
+`chcp 65001`;
 
 $tool = new Kernel();
 
