@@ -88,22 +88,31 @@ class Kernel {
         $array_uniq = array();
         //Отрезаем имя файла в конце строки элемента массива
         foreach ($array as $value) {
-            $array_uniq[] = dirname($value);
+            $array_uniq[] = dirname($value[1]);
         }
         //Удаляем повторяющиеся значения в массиве
-        $array_uniq = array_unique($array_uniq);
+        $array_uniq = array_unique($array_uniq, SORT_STRING);
         //Находим ключ элемент массива со значением "."
         $del = array_search(".", $array_uniq);
-        //Удаляем элемент массива со значением "."
-        unset($array_uniq[$del]);
+        //If $del != FALSE {
+        //  Удаляем элемент массива со значением "."
+        //}
+        if ($del) {
+            unset($array_uniq[$del]);
+        }
         //Если массив оказался  не пустым, то в цыкле создаём
         //необходимые директории для того, что бы положить
         //туда всё файлы, которые будем переименовывать ниже
         if (!empty($array_uniq)) {
-            foreach ($array_uniq as $value) {
-                //Создаём папку и пишем результат в консоль
-                mkdir($value, 0777, true);
-                echo "Created folder: " . $value . "\n";
+            foreach ($array_uniq as $folder) {
+                //Если папки не существует, то...
+                if (!file_exists($folder)) {
+                    //Создаём папку и пишем результат в консоль
+                    mkdir($folder, 0777, true);
+                    echo "Created folder: " . $folder . "\n"; 
+                } else {
+                    echo "Exists: " . $folder . "\n";
+                }
             }
         }
 
