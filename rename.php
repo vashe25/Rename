@@ -19,7 +19,7 @@ class Kernel {
     //Name of csv-file
     private $file_csv = "rename.csv";
     //For dir structure
-    private $file_dir = "folder.txt";
+    public $file_dir = "folder.txt";
     //searching for files
     public function scanFor(){
         //Дескриптор каталога
@@ -124,8 +124,32 @@ class Kernel {
     }
 
     public function folderCreate(){
+        
         if (file_exists($this->current_dir . $this->file_dir)) {
-            ///!!!!!!!
+            
+            $array = file($this->file_dir, FILE_SKIP_EMPTY_LINES | FILE_IGNORE_NEW_LINES);
+
+            $array = array_unique($array);
+
+            foreach ($array as $dirname) {
+                
+                mkdir($dirname, 0777, true) or exit("Error: $dirname");
+
+                echo "Folder created: " . $dirname . "\n";
+            }
+
+            return TRUE;
+
+        } else {
+
+            $fp = fopen($this->file_dir, "w");
+
+            fwrite($fp, "./New Folder");
+
+            fclose($fp);
+
+            return FALSE;
+
         }
     }
 }
@@ -133,7 +157,7 @@ class Kernel {
 //Выставляем UTF-8 в консоли
 //`chcp 65001`;
 
-//Выставляем UTF-8 в консоли
+//Выставляем Cyrillic (Windows 1251) в консоли
 `chcp 1251`;
 
 $tool = new Kernel();
@@ -165,7 +189,11 @@ switch ($parameter){
         break;
 
     case 'folder':
-        # code...
+        if ($tool->folderCreate()) {
+            echo "Job is done.\n";
+        } else {
+            echo "File " . $tool->file_dir . " is created.\nFill it with your structure folders.\n";
+        }
         break;
 
     default:
@@ -185,3 +213,5 @@ switch ($parameter){
         break;
 }
 echo "\nKernel->exit\n";
+exit;
+?>
