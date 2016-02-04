@@ -180,7 +180,7 @@ switch ($parameter){
         }
         $array = $tool->scanFor();
         $tool->createFile($array);
-        $tool->openFile();
+        //$tool->openFile();
         break;
 
     case 'rename':
