@@ -181,6 +181,7 @@ switch ($parameter){
         $array = $tool->scanFor();
         $tool->createFile($array);
         //$tool->openFile();
+        echo "Larva extruded.\n";
         break;
 
     case 'rename':
