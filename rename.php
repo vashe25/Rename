@@ -30,7 +30,8 @@ class Kernel {
         $filtered_files = array();
         //Поищем в массиве нашы файлы
         foreach ($array as $item){
-            if (fnmatch($this->pattern, $item)){
+            //FNM_CASEFOLD = 16
+            if (fnmatch($this->pattern, $item, 16)){
                 //Найденые файлы соберем в массивчик
                 $filtered_files[] = $item;
             }
