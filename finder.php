@@ -1,130 +1,81 @@
 <?php
 `chcp 65001`;
 
-$links = array(
-	"http://astrakhan.megafon.ru/tariffs/alltariffs/all_inclusive/all_inclusive_xs/xs.html",
-	"http://volgograd.megafon.ru/tariffs/alltariffs/all_inclusive/all_inclusive_xs/xs.html",
-	"http://orenburg.megafon.ru/tariffs/alltariffs/all_inclusive/all_inclusive_xs/xs.html",
-	"http://penza.megafon.ru/tariffs/alltariffs/all_inclusive/all_inclusive_xs/xs.html",
-	"http://bashkortostan.megafon.ru/tariffs/alltariffs/all_inclusive/all_inclusive_xs/xs.html",
-	"http://kalmykia.megafon.ru/tariffs/alltariffs/all_inclusive/all_inclusive_xs/xs.html",
-	"http://mariel.megafon.ru/tariffs/alltariffs/all_inclusive/all_inclusive_xs/xs.html",
-	"http://mordovia.megafon.ru/tariffs/alltariffs/all_inclusive/all_inclusive_xs/xs.html",
-	"http://tatarstan.megafon.ru/tariffs/alltariffs/all_inclusive/all_inclusive_xs/xs.html",
-	"http://samara.megafon.ru/tariffs/alltariffs/all_inclusive/all_inclusive_xs/xs.html",
-	"http://saratov.megafon.ru/tariffs/alltariffs/all_inclusive/all_inclusive_xs/xs.html",
-	"http://ulyanovsk.megafon.ru/tariffs/alltariffs/all_inclusive/all_inclusive_xs/xs.html",
-	"http://chuvashia.megafon.ru/tariffs/alltariffs/all_inclusive/all_inclusive_xs/xs.html",
-);
-
-$context = stream_context_create(
-	array(
-		"http" => array(
-			"method" => "GET",
-			"protocol_version" => "1.1",
-			"headers" => array(
-				'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:24.0) Gecko/20100101 Firefox/24.0',
-				//'Cookie: foo=bar\r\n',
-				'Connection: close',
-				),
-			)
-		)
-	);
-
-$stream = fopen('http://astrakhan.megafon.ru/tariffs/alltariffs/all_inclusive/all_inclusive_xs/xs.html', 'r', false, $context);
-
-if ($stream) {
-	echo "streaming";
-	
-	$page = stream_get_contents($stream); //page content
-	$data = stream_get_meta_data($stream); //headers
-
-	var_dump($data);
-	fclose($stream);
-
-} else {
-	echo "no stream";
-	$page[] = "Error: Failed to open stream";
-}
-
-exit;
-
 /**
 * Link Finder
 */
 class linkFinder 
 {
 	
-	function __construct(argument)
+	function __construct()
 	{
-		# code...
+		
 	}
 
-	public $context = stream_context_create(
-		array(
-			"http" => array(
-				"method" => "GET",
-				"protocol_version" => "1.1",
-				"headers" => array(
-					'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:24.0) Gecko/20100101 Firefox/24.0',
-					//'Cookie: foo=bar\r\n',
-					'Connection: close',
-					),
-				)
-			)
-		);
+	public $linksFile = "links.txt";
 
-	
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-foreach ($links as $link) {
-	
-	$pages[$link] = file_get_contents($link) or "fail";
-
-}
-
-$pattern = "{\".+\.pdf\"}";
-
-$matches = array();
-
-foreach ($pages as $link => $page) {
-	
-	preg_match($pattern, $page, $matches[$link]);
-
-}
-
-
-foreach ($matches as $link => $match) {
-	
-	$string .= $link . "\r\n";
-
-	foreach ($match as $value) {
-
-		$string .= "	" . trim($value,'"') . "\r\n";
-
+	public function loadFile($filename = "links.txt") {
+		if (file_exists($filename)) {
+			$array = file($filename, FILE_SKIP_EMPTY_LINES);
+			return $array;
+		} else {
+			$fp = fopen($filename, "w");
+			$string = "http://moscow.megafon.ru/";
+			fwrite($fp, $string);
+			fclose($fp);
+			return FALSE;
+		}
 	}
-	
+
+	public function getPage($array = array("http://moscow.megafon.ru/"))
+	{
+		$pages = array();
+		$ch = curl_init();
+		foreach ($array as $link) {
+			curl_setopt($ch, CURLOPT_URL, $link);
+			curl_setopt($ch, CURLOPT_FRESH_CONNECT, TRUE);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+			$pages[$link] = curl_exec($ch);
+		}
+		curl_close($ch);
+		return $pages;
+	}
+
+	public function findPattern($pages = array(), $pattern = "\".+.pdf\"")
+	{
+		$pattern = "{" . $pattern . "}";
+		$matches = array();
+		foreach ($pages as $link => $content) {
+			preg_match_all($pattern, $content, $matches[$link], PREG_SET_ORDER);
+		}
+		return $matches;
+	}
+
+	public function printResult($matches = array())
+	{	
+		$string = "Finded results:\r\n\r\n";
+		foreach ($matches as $link => $match) {
+			$string .= $link . "\r\n";
+			foreach ($match as $value) {
+				$string .= "	" . $value . "\r\n";
+			}
+		}
+		$fp = fopen("finderlog.txt", "w");
+		fwrite($fp, $string);
+		fclose($fp);
+	}
 }
 
-$fp = fopen("finderlog.txt", "w");
 
-fwrite($fp, $string);
+$Obj = new linkFinder();
 
-fclose($fp);
 
-//var_dump($matches);
+if ($links = $Obj->loadFile())
+{
+	$pages = $Obj->getPage($links);
+
+	$matches = $Obj->findPattern($pages);
+	var_dump($matches);
+	exit;
+	$Obj->printResult($matches);
+}
